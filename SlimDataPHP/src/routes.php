@@ -88,3 +88,65 @@ $app->put('/changeUserInfo/[{userID}]', function($request, $response){
 	$sth->execute();
 	return $this->response->withJson($input);
 });
+
+
+$app->get('/story/[{storyID}]', function (Request $request, Response $response, array $args) {
+        $sth = $this->db->prepare("SELECT storyTopic FROM stories WHERE storyID = :storyID");
+        $sth->bindParam("storyID", $args['storyID']);
+        $sth->execute();
+        $accounts = $sth->fetchAll();
+        return $this->response->withJson($accounts);
+});
+
+$app->get('/upcoming', function (Request $request, Response $response, array $args) {
+        $sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate >= CURDATE() ORDER BY storyDate, storyTime")
+        $sth->execute();
+        $stories = $sth->fetchAll();
+        return $this->response->withJson($stories);
+});
+
+$app->get('/specificStory/[{storyDate}]', function (Request $request, Response $response, array $args) {
+        $sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate = :storyDate ORDER BY storyTime");
+        $sth->bindParam("storyDate", $args['storyDate']);
+        $sth->execute();
+        $stories = $sth->fetchAll();
+        return $this->response->withJson($stories);
+});
+
+$app->post('/stories/createNew', function ($request, $response) {
+        $input = $request->getParsedBody();
+        $sql = "INSERT INTO stories (storyTopic, storyDate, storyTime, anchorID, description) VALUES (:storyTopic, :storyDate, :storyTime, :anchorID, :description)";
+        $sth = $this->db->prepare($sql);
+        $sth->bindParam("storyTopic", $input['storyTopic']);
+        $sth->bindParam("storyDate", $input['storyDate']);
+        $sth->bindParam("storyTime", $input['storyTime']);
+        $sth->bindParam("anchorID", $input['anchorID']);
+        $sth->bindParam("description", $input['description']);
+        $sth->execute();
+        return $this->response->withJson($input);
+});
+
+
+$app->put('/coverEvent', function($request, $response){
+        $input = $request->getParsedBody();
+        $sql = "UPDATE stories set storyTopic=:storyTopic, storyDate=:storyDate, storyTime=:storyTime, description=:description where storyID=:storyID";
+        $sth = $this->db->prepare($sql);
+        $sth->bindParam("storyTopic", $input['storyTopic']);
+        $sth->bindParam("storyDate", $input['storyDate']);
+        $sth->bindParam("storyTime", $input['storyTime']);
+        $sth->bindParam("storyID", $input['storyID']);
+        $sth->bindParam("description", $input['description']);
+        $sth->execute();
+        return $this->response->withJson($input);
+});
+
+
+$app->delete('/deleteEvent/[{storyID}]', function($request, $response){
+        $input = $request->getParsedBody();
+        $sql = "DELETE FROM stories WHERE storyID = :storyID";
+        $sth = $this->db->prepare($sql);
+        $sth->bindParam("storyID", $input['storyID']);
+        $sth->execute();
+        return $this->response->withJson($input);
+});
+
