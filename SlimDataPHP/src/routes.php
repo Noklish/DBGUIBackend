@@ -3,6 +3,10 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 // Routes
 
+$app->get('/',function ($request, $response, $args){
+	return "Welcome to Anchor Management! This is the homepage, and there's nothing here!";
+});
+
 $app->group('/accounts', function () use ($app) {
 	$app->get('/[{userID}]', function (Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT userId, userName, email FROM accounts WHERE userID=:userID");
@@ -156,4 +160,123 @@ $app->group('/stories', function () use ($app) {
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
+});
+
+$app->group('/equipment', function () use ($app) {
+	$app->get('/filter/[{type}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM equipment WHERE equipType = :type ORDER BY equipName");
+		$sth->bindParam("type", $args['type']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+	
+	$app->get('/search/[{conditions}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM equipment WHERE equipID = :conditions or equipName = :conditions or equipType = :conditions");
+		$sth->bindParam("conditions", $args['conditions']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+	
+	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT e.equipName, e.equipType FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID LEft Outer JOIN stories s on er.storyID = s.storyID WHERE s.storyID IS NULL AND e.equipID
+		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = :storyDate)");
+		$sth->bindParam("storyDate",$args['storyDate']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+	
+	$app->post('/reserve', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO equipReservations(equipID, storyID) values (:equipID, :storyID)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID",$input['storyID']);
+		$sth->bindParam("equipID",$input['equipID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->post('/add', function ($request, $response) {
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO equipment (equipName, equipType) VALUES (:equipName, :equipType)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("equipName", $input['equipName']);
+		$sth->bindParam("equipType", $input['equipType']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->delete('/deleteReservation', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "DELETE FROM equipReservations WHERE storyID = :storyID or equipID = :equipID";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID", $input['storyID']);
+		$sth->bindParam("equipID", $input['equipID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+});
+	
+	$app->group('/vehicles', function () use ($app) {
+		$app->get('/filter/[{conditions}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE vehicleType = :conditions OR color = :conditions OR capacity = :conditions ORDER BY vehicleName");
+		$sth->bindParam("conditions", $args['conditions']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	});
+	
+	$app->get('/search/[{conditions}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE vehicleID = :conditions or vehicleName = :conditions or vehicleType = :conditions");
+		$sth->bindParam("conditions", $args['conditions']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);	
+	});
+
+	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT v.vehicleName, v.vehicleType, v.model, v.capacity FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE s.storyID IS NULL AND v.vehicleID
+		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = :storyDate)");
+		$sth->bindParam("storyDate",$args['storyDate']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	});
+	
+	$app->post('/reserve', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO vehicleReservations(vehicleID, storyID) values (:vehicleID, :storyID)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID",$input['storyID']);
+		$sth->bindParam("vehicleID",$input['vehicleID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->post('/add', function ($request, $response) {
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO vehicles (vehicleName, vehicleType, color, model, capacity, storyID) VALUES (:vehicleName, :vehicleType, :color, :model, :capacity)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("vehicleName", $input['vehicleName']);
+		$sth->bindParam("vehicleType", $input['vehicleType']);
+		$sth->bindParam("color", $input['color']);
+		$sth->bindParam("model", $input['model']);
+		$sth->bindParam("capacity", $input['capacity']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->delete('/deleteReservation', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "DELETE FROM vehicleReservations WHERE storyID = :storyID or vehicleID = :vehicleID";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID", $input['storyID']);
+		$sth->bindParam("vehicleID", $input['vehicleID']);
+		$sth->execute();
+		return $this->response->withJson($input);	
+	});
+	
 });
