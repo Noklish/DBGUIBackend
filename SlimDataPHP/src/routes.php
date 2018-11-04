@@ -101,14 +101,14 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/upcoming', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT s.*, a.userName FROM stories s JOIN accounts a ON s.anchorID = a.userID WHERE storyDate >= CURDATE() ORDER BY storyDate, storyTime");
+		$sth = $this->db->prepare("SELECT s.*, a.userName FROM stories s JOIN accounts a ON s.anchorID = a.userID WHERE storyDate >= CURDATE() ORDER BY storyDate, startTime");
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
 	});
 
 	$app->get('/specificStory/[{storyDate}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate = :storyDate ORDER BY storyTime");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate = :storyDate ORDER BY startTime");
 		$sth->bindParam("storyDate", $args['storyDate']);
 		$sth->execute();
 		$stories = $sth->fetchAll();
@@ -117,11 +117,12 @@ $app->group('/stories', function () use ($app) {
 
 	$app->post('/createNew', function ($request, $response) {
 		$input = $request->getParsedBody();
-		$sql = "INSERT INTO stories (storyTopic, storyDate, storyTime, anchorID, description) VALUES (:storyTopic, :storyDate, :storyTime, :anchorID, :description)";
+		$sql = "INSERT INTO stories (storyTopic, storyDate, startTime, endTime, anchorID, description) VALUES (:storyTopic, :storyDate, :startTime, :endTime, :anchorID, :description)";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyTopic", $input['storyTopic']);
 		$sth->bindParam("storyDate", $input['storyDate']);
-		$sth->bindParam("storyTime", $input['storyTime']);
+		$sth->bindParam("startTime", $input['startTime']);
+		$sth->bindParam("endTime", $input['endTime']);
 		$sth->bindParam("anchorID", $input['anchorID']);
 		$sth->bindParam("description", $input['description']);
 		$sth->execute();
@@ -131,11 +132,12 @@ $app->group('/stories', function () use ($app) {
 
 	$app->put('/coverEvent', function($request, $response){
 		$input = $request->getParsedBody();
-		$sql = "UPDATE stories set storyTopic=:storyTopic, storyDate=:storyDate, storyTime=:storyTime, description=:description where storyID=:storyID";
+		$sql = "UPDATE stories set storyTopic=:storyTopic, storyDate=:storyDate, startTime=:startTime, endTime=:endTime, description=:description where storyID=:storyID";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyTopic", $input['storyTopic']);
 		$sth->bindParam("storyDate", $input['storyDate']);
-		$sth->bindParam("storyTime", $input['storyTime']);
+		$sth->bindParam("startTime", $input['startTime']);
+		$sth->bindParam("endTime", $input['endTime']);
 		$sth->bindParam("storyID", $input['storyID']);
 		$sth->bindParam("description", $input['description']);
 		$sth->execute();
@@ -180,9 +182,12 @@ $app->group('/equipment', function () use ($app) {
 	});
 	
 	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT e.equipName, e.equipType FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID LEft Outer JOIN stories s on er.storyID = s.storyID WHERE s.storyID IS NULL AND e.equipID
-		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = :storyDate)");
+		$sth = $this->db->prepare("SELECT e.equipName, e.equipType FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID 
+		LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE s.storyID IS NULL AND e.equipID
+		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = :storyDate AND st.startTime >= :startTime AND st.endTime <= :endTime)");
 		$sth->bindParam("storyDate",$args['storyDate']);
+		$sth->bindParam("startTime", $args['startTime']);
+		$sth->bindParam("endTime", $args['endTime']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
 		return $this->response->withJson($equipment);
@@ -220,8 +225,8 @@ $app->group('/equipment', function () use ($app) {
 	
 });
 	
-	$app->group('/vehicles', function () use ($app) {
-		$app->get('/filter/[{conditions}]', function (Request $request, Response $response, array $args) {
+$app->group('/vehicles', function () use ($app) {
+	$app->get('/filter/[{conditions}]', function (Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE vehicleType = :conditions OR color = :conditions OR capacity = :conditions ORDER BY vehicleName");
 		$sth->bindParam("conditions", $args['conditions']);
 		$sth->execute();
@@ -239,7 +244,7 @@ $app->group('/equipment', function () use ($app) {
 
 	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT v.vehicleName, v.vehicleType, v.model, v.capacity FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE s.storyID IS NULL AND v.vehicleID
-		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = :storyDate)");
+		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = :storyDate AND st.startTime >= :startTime AND st.endTime <= :endTime)");
 		$sth->bindParam("storyDate",$args['storyDate']);
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
@@ -275,6 +280,64 @@ $app->group('/equipment', function () use ($app) {
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $input['storyID']);
 		$sth->bindParam("vehicleID", $input['vehicleID']);
+		$sth->execute();
+		return $this->response->withJson($input);	
+	});
+	
+});
+
+$app->group('/experts', function () use ($app) {
+	$app->get('/filter/[{conditions}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM experts WHERE expertTopic = :conditions");
+		$sth->bindParam("conditions", $args['conditions']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	});
+	
+	$app->get('/search/[{conditions}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE expertID = :conditions or expertName = :conditions or expertTopic = :conditions");
+		$sth->bindParam("conditions", $args['conditions']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);	
+	});
+
+	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT e.expertName, e.expertTopic FROM experts e LEFT OUTER JOIN expertReservations er on e.expertID = er.expertID LEft Outer JOIN stories s on er.storyID = s.storyID WHERE s.storyID IS NULL AND v.vehicleID
+		NOT IN (SELECT er.expertID FROM expertReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = :storyDate AND st.startTime >= :startTime AND st.endTime <= :endTime)");
+		$sth->bindParam("storyDate",$args['storyDate']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	});
+	
+	$app->post('/reserve', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO expertReservations(expertID, storyID) values (:expertID, :storyID)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID",$input['storyID']);
+		$sth->bindParam("expertID",$input['expertID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->post('/add', function ($request, $response) {
+		$input = $request->getParsedBody();
+		$sql = "INSERT INTO experts(expertName, expertTopic) VALUES (:expertName, :expertTopic)";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("expertName", $input['expertName']);
+		$sth->bindParam("expertTopic", $input['expertTopic']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+	
+	$app->delete('/deleteReservation', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "DELETE FROM expertReservations WHERE storyID = :storyID AND expertID = :expertID";
+		$sth = $this->db->prepare($sql);
+		$sth->bindParam("storyID", $input['storyID']);
+		$sth->bindParam("expertID", $input['expertID']);
 		$sth->execute();
 		return $this->response->withJson($input);	
 	});
