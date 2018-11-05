@@ -1,3 +1,4 @@
+drop database if exists AnchorManAgement;
 create database AnchorManAgement;
 use AnchorManAgement;
 
@@ -21,8 +22,8 @@ stories (storyID int not null auto_increment, storyTopic varchar (100), storyDat
 
 
 
-drop table if exists equipements;
-create table equipements (equipID int not null auto_increment, equipName varchar(50), equipType varchar(50),  primary key (equipID));
+drop table if exists equipment;
+create table equipment (equipID int not null auto_increment, equipName varchar(50), equipType varchar(50),  primary key (equipID));
 #insert into equipements (equipName, equipType) values ("Mic", "microphone");
 #insert into equipements (equipName, equipType) values ("Mic", "microphone");
 
@@ -46,8 +47,7 @@ create table equipReservations (equipID int, storyID int);
 
 drop table if exists experts;
 create table experts (expertID int not null auto_increment, expertName varchar(50), expertTopic varchar(50), primary key(expertID));
-select * from experts;
 
 drop table if exists expertReservations;
 create table expertReservations (expertID int, storyID int);
-select * from expertReservations;
+#insert into expertreservations values (1,4);
