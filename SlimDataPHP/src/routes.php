@@ -24,6 +24,22 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($points);
 	});
 
+	$app->post('/login', function ($request, $response) {
+		$input = $request->getParsedBody();
+		$sth = $this->db->prepare("SELECT * FROM accounts WHERE email = :email AND pass = :pass");
+		$sth->bindParam("email", $input['email']);
+		$sth->bindParam("pass", $input['pass']);
+		$sth->execute();
+		if($sth->rowCount() != 0)
+		{
+			return $this->response->withJson(array("Successful Login",1));
+		}
+		else
+		{
+			return $this->response->withJson(array("Incorrect credentials; please try again",0));
+		}
+	});
+
 	$app->post('/newAccount', function ($request, $response) {
 		$input = $request->getParsedBody();
 		$sql = "INSERT INTO accounts (userName, email, pass, typeFlag) VALUES (:userName, :email, :pass, :typeFlag)";
@@ -124,9 +140,24 @@ $app->group('/stories', function () use ($app) {
 		return $this->response->withJson($stories);
 	});
 
+	$app->get('/myStories/[{userID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND storyDate >= CURDATE()");
+		$sth->bindParam("userID", $args['userID']);
+		$sth->execute();
+		$stories = $sth->fetchAll();
+		return $this->response->withJson($stories);
+	});
+
 	$app->get('/specificStory/[{storyDate}]', function (Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate = :storyDate ORDER BY startTime");
 		$sth->bindParam("storyDate", $args['storyDate']);
+		$sth->execute();
+		$stories = $sth->fetchAll();
+		return $this->response->withJson($stories);
+	});
+
+	$app->get('/unclaimed', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND storyDate >= CURDATE()");
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
