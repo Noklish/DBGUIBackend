@@ -122,6 +122,24 @@ $app->group('/accounts', function () use ($app) {
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
+	
+	$app->put('/unassignFromStory/[{storyID}]', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "UPDATE stories SET anchorID = NULL WHERE storyID=:storyID";
+		$sth = $this->db->prepare($sql);	
+		$sth->bindParam("storyID", $input['storyID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
+
+	$app->put('/unassignFromManager/{anchorID}', function($request, $response){
+		$input = $request->getParsedBody();
+		$sql = "UPDATE anchorDetails SET managerID = NULL WHERE userID=:userID";
+		$sth = $this->db->prepare($sql);	
+		$sth->bindParam("userID", $input['userID']);
+		$sth->execute();
+		return $this->response->withJson($input);
+	});
 });
 
 $app->group('/stories', function () use ($app) {
