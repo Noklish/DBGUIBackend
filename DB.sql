@@ -5,9 +5,9 @@ use AnchorManAgement;
 
 drop table if exists accounts;
 create table accounts (userID int not null auto_increment, userName varchar(50), email varchar(50), pass varchar(50), typeFlag bit, primary key(userID));
-insert into accounts values("Ron Burgundy", "Ron@mail.com", "password", 1);
-insert into accounts values("Alex Jones", "chemtrails@infowars.com", "frogs", 1);
-insert into accounts values("Manager Man", "mgmt@anchormanagement.com", "manager", 0);
+insert into accounts (userName, email, pass, typeFlag) values("Ron Burgundy", "Ron@mail.com", "password", 1);
+insert into accounts (userName, email, pass, typeFlag) values("Alex Jones", "chemtrails@infowars.com", "frogs", 1);
+insert into accounts (userName, email, pass, typeFlag) values("Manager Man", "mgmt@anchormanagement.com", "manager", 0);
 
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
