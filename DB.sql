@@ -27,9 +27,9 @@ insert into stories (storyTopic, storyDate, startTime, endTime, description) val
 
 drop table if exists equipment;
 create table equipment (equipID int not null auto_increment, equipName varchar(50), equipType varchar(50),  primary key (equipID));
-insert into equipements (equipName, equipType) values ("Boom Mic 1", "microphone");
-insert into equipements (equipName, equipType) values ("Camera 2", "Handheld Camera");
-insert into equipements (equipName, equipType) values ("Tripod 2", "Large Tripod");
+insert into equipment (equipName, equipType) values ("Boom Mic 1", "microphone");
+insert into equipment (equipName, equipType) values ("Camera 2", "Handheld Camera");
+insert into equipment (equipName, equipType) values ("Tripod 2", "Large Tripod");
 
 
 drop table if exists vehicles;
