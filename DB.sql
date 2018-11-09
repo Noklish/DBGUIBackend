@@ -4,8 +4,9 @@ use AnchorManAgement;
 
 
 drop table if exists accounts;
-create table accounts (userID int, userName varchar(50), email varchar(50), pass varchar(50), typeFlag bit);
+create table accounts (userID int not null auto_increment, userName varchar(50), email varchar(50), pass varchar(50), typeFlag bit, primary key(userID));
 #insert into accounts values(1, "Name", "email@somewhere.com", "password", 1);
+#select * from accounts;
 
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
@@ -18,6 +19,7 @@ stories (storyID int not null auto_increment, storyTopic varchar (100), storyDat
 #insert into stories (storyTopic, storyDate, startTime, endTime, anchorID, description) values ( "I don't know.", '2018-11-21', '23:40:20', '23:50:20', 3,"Please see here!");
 #insert into stories (storyTopic, storyDate, startTime, endTime, anchorID, description) values ( "ok.", '2018-10-24', '09:10:20','11:30:00', 5,"Please !");
 #insert into stories (storyTopic, storyDate, startTime, endTime, anchorID, description) values ( "0.0", '2018-10-24', '08:10:20','10:20:00',6,"here!");
+#insert into stories (storyTopic, storyDate, startTime, endTime, description) values ( "Reee", '2018-12-30', '08:10:20','10:20:00',"aaaaaa");
 #select * from stories;
 
 
@@ -33,7 +35,7 @@ create table vehicles (vehicleID int not null auto_increment, vehicleName varcha
 #insert into vehicles (vehicleName, vehicleType, color, model, capacity) values ("Car", "car", "white", "model", 4);
 #insert into vehicles (vehicleName, vehicleType, color, model, capacity) values ("Car", "car", "black", "model", 5);
 #insert into vehicles (vehicleName, vehicleType, color, model, capacity) values ("Car", "car", "yellow", "model", 3);
-
+#select * from vehicles;
 
 drop table if exists vehicleReservations;
 create table vehicleReservations (vehicleID int, storyID int);
@@ -47,6 +49,7 @@ create table equipReservations (equipID int, storyID int);
 
 drop table if exists experts;
 create table experts (expertID int not null auto_increment, expertName varchar(50), expertTopic varchar(50), primary key(expertID));
+#select * from experts;
 
 drop table if exists expertReservations;
 create table expertReservations (expertID int, storyID int);
