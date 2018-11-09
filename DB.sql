@@ -11,8 +11,8 @@ insert into accounts (userName, email, pass, typeFlag) values("Manager Man", "mg
 
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
-update anchorDetails set managerID = 3 WHERE userID = 1;
-update anchorDetails set managerID = 3 WHERE userID = 2;
+insert into anchorDetails values (1, 0, 3);
+insert into anchorDetails values (2, 0, 3);
 
 
 drop table if exists stories;
