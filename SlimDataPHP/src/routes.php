@@ -198,6 +198,75 @@ $app->group('/stories', function () use ($app) {
 		return $this->response->withJson($equipment);
 	});
 
+	$app->get('/availableEquipment/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
+		$date->bindParam("storyID",$args['storyID']);
+		$date->execute();
+		$selectedDate = $date->fetchColumn();
+
+		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
+		$start->bindParam("storyID",$args['storyID']);
+		$start->execute();
+		$selectedStart = $start->fetchColumn();
+	
+		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
+		$end->bindParam("storyID",$args['storyID']);
+		$end->execute();
+		$selectedEnd = $end->fetchColumn();
+
+		$sth = $this->db->prepare("SELECT e.equipName, e.equipType FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.equipID
+		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+
+	$app->get('/availableVehicles/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
+		$date->bindParam("storyID",$args['storyID']);
+		$date->execute();
+		$selectedDate = $date->fetchColumn();
+
+		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
+		$start->bindParam("storyID",$args['storyID']);
+		$start->execute();
+		$selectedStart = $start->fetchColumn();
+	
+		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
+		$end->bindParam("storyID",$args['storyID']);
+		$end->execute();
+		$selectedEnd = $end->fetchColumn();
+
+		$sth = $this->db->prepare("SELECT v.vehicleName, v.vehicleType, v.model, v.capacity FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE v.vehicleID
+		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	});
+
+	$app->get('/availableExperts/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
+		$date->bindParam("storyID",$args['storyID']);
+		$date->execute();
+		$selectedDate = $date->fetchColumn();
+
+		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
+		$start->bindParam("storyID",$args['storyID']);
+		$start->execute();
+		$selectedStart = $start->fetchColumn();
+	
+		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
+		$end->bindParam("storyID",$args['storyID']);
+		$end->execute();
+		$selectedEnd = $end->fetchColumn();
+
+		$sth = $this->db->prepare("SELECT e.expertName, e.expertTopic FROM experts e LEFT OUTER JOIN expertReservations er on e.expertID = er.expertID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.expertID
+		NOT IN (SELECT er.expertID FROM expertReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
+		$sth->execute();
+		$experts = $sth->fetchAll();
+		return $this->response->withJson($experts);
+	});
+
 	$app->post('/createNew', function ($request, $response) {
 		$input = $request->getParsedBody();
 		$sql = "INSERT INTO stories (storyTopic, storyDate, startTime, endTime, anchorID, description) VALUES (:storyTopic, :storyDate, :startTime, :endTime, :anchorID, :description)";
@@ -264,33 +333,6 @@ $app->group('/equipment', function () use ($app) {
 		return $this->response->withJson($equipment);
 	});
 	
-	$app->get('/available/[{storyDate}]', function (Request $request, Response $response, array $args) {
-		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
-		$date->bindParam("storyID",$args['storyID']);
-		$date->execute();
-		$selectedDate = $date->fetchColumn();
-
-		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
-		$start->bindParam("storyID",$args['storyID']);
-		$start->execute();
-		$selectedStart = $start->fetchColumn();
-	
-		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
-		$end->bindParam("storyID",$args['storyID']);
-		$end->execute();
-		$selectedEnd = $end->fetchColumn();
-		
-		$sth = $this->db->prepare("SELECT e.equipName, e.equipType FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID 
-		LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.equipID
-		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
-		$sth->bindParam("storyDate",$args['storyDate']);
-		$sth->bindParam("startTime", $args['startTime']);
-		$sth->bindParam("endTime", $args['endTime']);
-		$sth->execute();
-		$equipment = $sth->fetchAll();
-		return $this->response->withJson($equipment);
-	});
-	
 	$app->post('/reserve', function($request, $response){
 		$input = $request->getParsedBody();
 		$sql = "INSERT INTO equipReservations(equipID, storyID) values (:equipID, :storyID)";
@@ -338,30 +380,6 @@ $app->group('/vehicles', function () use ($app) {
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
 		return $this->response->withJson($vehicles);	
-	});
-
-	$app->get('/available/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
-		$date->bindParam("storyID",$args['storyID']);
-		$date->execute();
-		$selectedDate = $date->fetchColumn();
-
-		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
-		$start->bindParam("storyID",$args['storyID']);
-		$start->execute();
-		$selectedStart = $start->fetchColumn();
-	
-		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
-		$end->bindParam("storyID",$args['storyID']);
-		$end->execute();
-		$selectedEnd = $end->fetchColumn();
-
-		$sth = $this->db->prepare("SELECT v.vehicleName, v.vehicleType, v.model, v.capacity FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE v.vehicleID
-		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
-		$sth->bindParam("storyDate",$args['storyDate']);
-		$sth->execute();
-		$vehicles = $sth->fetchAll();
-		return $this->response->withJson($vehicles);
 	});
 	
 	$app->post('/reserve', function($request, $response){
@@ -414,30 +432,6 @@ $app->group('/experts', function () use ($app) {
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
 		return $this->response->withJson($vehicles);	
-	});
-
-	$app->get('/available/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$date = $this->db->prepare("SELECT storyDate FROM stories WHERE storyID = :storyID");
-		$date->bindParam("storyID",$args['storyID']);
-		$date->execute();
-		$selectedDate = $date->fetchColumn();
-
-		$start = $this->db->prepare("SELECT startTime FROM stories WHERE storyID = :storyID");
-		$start->bindParam("storyID",$args['storyID']);
-		$start->execute();
-		$selectedStart = $start->fetchColumn();
-	
-		$end = $this->db->prepare("SELECT endTime FROM stories WHERE storyID = :storyID");
-		$end->bindParam("storyID",$args['storyID']);
-		$end->execute();
-		$selectedEnd = $end->fetchColumn();
-
-		$sth = $this->db->prepare("SELECT e.expertName, e.expertTopic FROM experts e LEFT OUTER JOIN expertReservations er on e.expertID = er.expertID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.expertID
-		NOT IN (SELECT er.expertID FROM expertReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
-		//$sth->bindParam("storyID", $args['storyID']);
-		$sth->execute();
-		$experts = $sth->fetchAll();
-		return $this->response->withJson($experts);
 	});
 	
 	$app->post('/reserve', function($request, $response){
