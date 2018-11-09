@@ -48,13 +48,6 @@ $app->group('/accounts', function () use ($app) {
 		//ensure username and email are not already in use
 		$userNameSelected = $input['userName'];
 		$emailSelected = $input['email'];
-		$result = $this->db->prepare("SELECT userName FROM accounts WHERE userName = '$userNameSelected'");
-		$result->execute();
-		if($result->rowCount() != 0)
-		{
-			echo "Username already taken, please select another.";
-			return;
-		}
 		$result = $this->db->prepare("SELECT email FROM accounts WHERE email = '$emailSelected'");
 		$result->execute();
 		if($result->rowCount() != 0)
@@ -181,6 +174,30 @@ $app->group('/stories', function () use ($app) {
 		return $this->response->withJson($stories);
 	});
 
+	$app->get('/reservedEquipment/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT equipID FROM equipReservations WHERE storyID = :storyID");
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+
+	$app->get('/reservedVehicles/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT vehicleID FROM vehicleReservations WHERE storyID = :storyID");
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+
+	$app->get('/reservedExperts/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT expertID FROM expertReservations WHERE storyID = :storyID");
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
+
 	$app->post('/createNew', function ($request, $response) {
 		$input = $request->getParsedBody();
 		$sql = "INSERT INTO stories (storyTopic, storyDate, startTime, endTime, anchorID, description) VALUES (:storyTopic, :storyDate, :startTime, :endTime, :anchorID, :description)";
@@ -269,30 +286,6 @@ $app->group('/equipment', function () use ($app) {
 		$sth->bindParam("storyDate",$args['storyDate']);
 		$sth->bindParam("startTime", $args['startTime']);
 		$sth->bindParam("endTime", $args['endTime']);
-		$sth->execute();
-		$equipment = $sth->fetchAll();
-		return $this->response->withJson($equipment);
-	});
-
-	$app->get('/reservedEquipment/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT equipID FROM equipReservations WHERE storyID = :storyID");
-		$sth->bindParam("storyID", $args['storyID']);
-		$sth->execute();
-		$equipment = $sth->fetchAll();
-		return $this->response->withJson($equipment);
-	});
-
-	$app->get('/reservedVehicles/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT vehicleID FROM vehicleReservations WHERE storyID = :storyID");
-		$sth->bindParam("storyID", $args['storyID']);
-		$sth->execute();
-		$equipment = $sth->fetchAll();
-		return $this->response->withJson($equipment);
-	});
-
-	$app->get('/reservedExperts/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT expertID FROM expertReservations WHERE storyID = :storyID");
-		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
 		return $this->response->withJson($equipment);
