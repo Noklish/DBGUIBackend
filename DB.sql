@@ -12,13 +12,13 @@ insert into accounts (userName, email, pass, typeFlag) values("Manager Man", "mg
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
 update anchorDetails set managerID = 3 WHERE userID = 1;
-update anchorDetails set managerID = 3 WHERE userID = 0;
+update anchorDetails set managerID = 3 WHERE userID = 2;
 
 
 drop table if exists stories;
 create table 
 stories (storyID int not null auto_increment, storyTopic varchar (100), storyDate date, startTime time, endTime time, anchorID int, description varchar (200), points int, primary key(storyID));
-insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "Thanksgiving", '2018-11-21', '20:00:00', '23:00:00', 3,"Turkeys!");
+insert into stories (storyTopic, storyDate, startTime, endTime, anchorID, points, description) values ( "Thanksgiving", '2018-11-21', '20:00:00', '23:00:00', 1, 3,"Turkeys!");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "Christmas", '2018-12-25', '09:10:20','11:30:00', 5,"Presents!");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "Christmas Evening", '2018-12-25', '14:10:20','17:20:00',6,"Santa!");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "New Years Eve", '2018-12-31', '23:00:00','23:50:00',10,"nye");
