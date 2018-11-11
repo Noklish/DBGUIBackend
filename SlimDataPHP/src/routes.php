@@ -191,7 +191,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/reservedEquipment/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT e.* FROM equipment e JOIN equipReservations er on e.eqipID = er.equipID WHERE er.storyID = :storyID");
+		$sth = $this->db->prepare("SELECT e.* FROM equipment e JOIN equipReservations er on e.equipID = er.equipID WHERE er.storyID = :storyID");
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
