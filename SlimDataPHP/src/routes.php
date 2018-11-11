@@ -191,7 +191,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/reservedEquipment/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT equipID FROM equipReservations WHERE storyID = :storyID");
+		$sth = $this->db->prepare("SELECT * FROM equipReservations WHERE storyID = :storyID");
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
@@ -199,7 +199,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/reservedVehicles/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT vehicleID FROM vehicleReservations WHERE storyID = :storyID");
+		$sth = $this->db->prepare("SELECT * FROM vehicleReservations WHERE storyID = :storyID");
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
@@ -207,7 +207,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/reservedExperts/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT expertID FROM expertReservations WHERE storyID = :storyID");
+		$sth = $this->db->prepare("SELECT * FROM expertReservations WHERE storyID = :storyID");
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$equipment = $sth->fetchAll();
