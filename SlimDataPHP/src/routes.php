@@ -8,6 +8,14 @@ $app->get('/',function ($request, $response, $args){
 });
 
 $app->group('/accounts', function () use ($app) {
+
+	$app->get('/unmanagedAnchors', function(Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT a.userName, a.userID, ad.points FROM accounts a JOIN anchorDetails ad ON a.userID = ad.userID WHERE ad.managerID IS NULL OR ad.managerID = 0");
+		$sth->execute();
+		$anchors = $sth->fetchAll();
+		return $this->response->withJson($anchors);
+	});
+
 	$app->get('/[{userID}]', function (Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT userId, userName, email FROM accounts WHERE userID=:userID");
 		$sth->bindParam("userID", $args['userID']);
@@ -16,27 +24,20 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($accounts);
 	});
 
-	$app->get('/myManager/[{userID}]', function(Request $request, Response $response, array $args) {
+	$app->get('/myAnchors/[{userID}]', function(Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT a.*, ad.points FROM accounts a LEFT OUTER JOIN anchorDetails ad on a.userID = ad.userID WHERE ad.managerID = :userID");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
-		$mgr = $sth->fetchAll();
-		return $this->response->withJson($mgr);
-	});
-
-	$app->get('/unmanagedAnchors', function(Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT a.userName, a.userID, ad.points, FROM accounts a JOIN anchorDetails ad ON a.userID = ad.userID WHERE ad.managerID IS NULL OR ad.managerID = 0");
-		$sth->execute();
-		$anchors = $sth->fetchAll();
-		return $this->response->withJson($anchors);
+		$ancs = $sth->fetchAll();
+		return $this->response->withJson($ancs);
 	});
 
 	$app->get('/myManager/[{userID}]', function(Request $request, Response $response, array $args) {
 		$sth = $this->db->prepare("SELECT a.* FROM accounts a JOIN anchorDetails ad ON ad.managerID = a.userID WHERE ad.userID = :userID");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
-		$points = $sth->fetchAll();
-		return $this->response->withJson($points);
+		$mgr = $sth->fetchAll();
+		return $this->response->withJson($mgr);
 	});
 
 	$app->post('/login', function ($request, $response) {
