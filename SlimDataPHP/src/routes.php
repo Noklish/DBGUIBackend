@@ -1,6 +1,7 @@
 <?php
 use Slim\Http\Request;
 use Slim\Http\Response;
+header("Access-Control-Allow-Origin: *");
 // Routes
 
 $app->get('/',function ($request, $response, $args){
