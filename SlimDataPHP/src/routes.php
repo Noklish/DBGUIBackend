@@ -16,8 +16,23 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($accounts);
 	});
 
-	$app->get('/anchorPoints/[{userID}]', function(Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT a.userName, ad.points FROM accounts a LEFT OUTER JOIN anchorDetails ad on a.userID = ad.userID WHERE ad.managerID = :userID");
+	$app->get('/myManager/[{userID}]', function(Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT a.*, ad.points FROM accounts a LEFT OUTER JOIN anchorDetails ad on a.userID = ad.userID WHERE ad.managerID = :userID");
+		$sth->bindParam("userID", $args['userID']);
+		$sth->execute();
+		$mgr = $sth->fetchAll();
+		return $this->response->withJson($mgr);
+	});
+
+	$app->get('/unmanagedAnchors', function(Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT a.userName, a.userID, ad.points, FROM accounts a JOIN anchorDetails ad ON a.userID = ad.userID WHERE ad.managerID IS NULL OR ad.managerID = 0");
+		$sth->execute();
+		$anchors = $sth->fetchAll();
+		return $this->response->withJson($anchors);
+	});
+
+	$app->get('/myManager/[{userID}]', function(Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT a.* FROM accounts a JOIN anchorDetails ad ON ad.managerID = a.userID WHERE ad.userID = :userID");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$points = $sth->fetchAll();
