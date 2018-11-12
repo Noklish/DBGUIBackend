@@ -323,11 +323,11 @@ $app->group('/stories', function () use ($app) {
 		return $this->response->withJson($input);
 	});
 
-	$app->delete('/deleteEvent/[{storyID}]', function($request, $response){
+	$app->delete('/deleteEvent/[{storyID}]', function($request, $response, $args){
 		$input = $request->getParsedBody();
 		$sql = "DELETE FROM stories WHERE storyID = :storyID";
 		$sth = $this->db->prepare($sql);
-		$sth->bindParam("storyID", $input['storyID']);
+		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
@@ -370,13 +370,14 @@ $app->group('/equipment', function () use ($app) {
 		return $this->response->withJson($input);
 	});
 	
-	$app->delete('/deleteReservation', function($request, $response){
+	$app->delete('/deleteReservation[/{storyID}[/{equipID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
-		$sql = "DELETE FROM equipReservations WHERE storyID = :storyID or equipID = :equipID";
+		$sql = "DELETE FROM equipReservations WHERE storyID = :storyID AND equipID = :equipID";
 		$sth = $this->db->prepare($sql);
-		$sth->bindParam("storyID", $input['storyID']);
-		$sth->bindParam("equipID", $input['equipID']);
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->bindParam("equipID", $args['equipID']);
 		$sth->execute();
+		//$result = $sth->fetchAll();
 		return $this->response->withJson($input);
 	});
 	
@@ -422,15 +423,16 @@ $app->group('/vehicles', function () use ($app) {
 		return $this->response->withJson($input);
 	});
 	
-	$app->delete('/deleteReservation', function($request, $response){
+	$app->delete('/deleteReservation[/{storyID}[/{vehicleID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
 		$sql = "DELETE FROM vehicleReservations WHERE storyID = :storyID or vehicleID = :vehicleID";
 		$sth = $this->db->prepare($sql);
-		$sth->bindParam("storyID", $input['storyID']);
-		$sth->bindParam("vehicleID", $input['vehicleID']);
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->bindParam("vehicleID", $args['vehicleID']);
 		$sth->execute();
 		return $this->response->withJson($input);	
 	});
+	
 	
 });
 
@@ -470,13 +472,12 @@ $app->group('/experts', function () use ($app) {
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
-	
-	$app->delete('/deleteReservation', function($request, $response){
+	$app->delete('/deleteReservation[/{storyID}[/{expertID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
-		$sql = "DELETE FROM expertReservations WHERE storyID = :storyID AND expertID = :expertID";
+		$sql = "DELETE FROM expertReservations WHERE storyID = :storyID or expertID = :expertID";
 		$sth = $this->db->prepare($sql);
-		$sth->bindParam("storyID", $input['storyID']);
-		$sth->bindParam("expertID", $input['expertID']);
+		$sth->bindParam("storyID", $args['storyID']);
+		$sth->bindParam("expertID", $args['expertID']);
 		$sth->execute();
 		return $this->response->withJson($input);	
 	});
