@@ -43,19 +43,14 @@ $app->group('/accounts', function () use ($app) {
 
 	$app->post('/login', function ($request, $response) {
 		$input = $request->getParsedBody();
-		$emailSelected = $input['email'];
-		$passSelected = $input['pass'];
-		$sth = $this->db->prepare("SELECT * FROM accounts WHERE email = '$emailSelected' AND pass = '$passSelected'");
-		// $sth->bindParam("email", $input['email']);
-		// $sth->bindParam("pass", $input['pass']);
+		$sth = $this->db->prepare("SELECT * FROM accounts WHERE email = :email AND pass = :pass");
+		$sth->bindParam("email", $input['email']);
+		$sth->bindParam("pass", $input['pass']);
 		$sth->execute();
-		$uID = $this->db->prepare("SELECT userID FROM accounts WHERE email = '$emailSelected' AND pass = '$passSelected'");
-		// $uID->bindParam("email", $input['email']);
-		// $uID->bindParam("pass", $input['pass']);
-		$uID->execute();
+		$log = $sth->fetchAll();
 		if($sth->rowCount() != 0)
 		{
-			return $this->response->withJson(array("Successful Login",$uID->fetchColumn()));
+			return $this->response->withJson(array($log,"Successful Login",1));
 		}
 		else
 		{
