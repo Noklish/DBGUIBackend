@@ -233,7 +233,7 @@ $app->group('/stories', function () use ($app) {
 		$end->execute();
 		$selectedEnd = $end->fetchColumn();
 
-		$sth = $this->db->prepare("SELECT * FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.equipID
+		$sth = $this->db->prepare("SELECT e.* FROM equipment e LEFT OUTER JOIN equipReservations er on e.equipID = er.equipID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.equipID
 		NOT IN (SELECT er.equipID FROM equipReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
 		$sth->execute();
 		$equipment = $sth->fetchAll();
@@ -256,7 +256,7 @@ $app->group('/stories', function () use ($app) {
 		$end->execute();
 		$selectedEnd = $end->fetchColumn();
 
-		$sth = $this->db->prepare("SELECT * FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE v.vehicleID
+		$sth = $this->db->prepare("SELECT v.* FROM vehicles v LEFT OUTER JOIN vehicleReservations vr on v.vehicleID = vr.vehicleID LEft Outer JOIN stories s on vr.storyID = s.storyID WHERE v.vehicleID
 		NOT IN (SELECT vr.vehicleID FROM vehicleReservations vr JOIN stories st on vr.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
@@ -279,7 +279,7 @@ $app->group('/stories', function () use ($app) {
 		$end->execute();
 		$selectedEnd = $end->fetchColumn();
 
-		$sth = $this->db->prepare("SELECT * FROM experts e LEFT OUTER JOIN expertReservations er on e.expertID = er.expertID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.expertID
+		$sth = $this->db->prepare("SELECT e.* FROM experts e LEFT OUTER JOIN expertReservations er on e.expertID = er.expertID LEFT OUTER JOIN stories s on er.storyID = s.storyID WHERE e.expertID
 		NOT IN (SELECT er.expertID FROM expertReservations er JOIN stories st on er.storyID = st.storyID WHERE st.storyDate = '$selectedDate' AND (st.startTime <= '$selectedStart' AND '$selectedStart' <= st.endTime) OR (st.endTime >= '$selectedEnd' AND '$selectedEnd' >= st.startTime));");
 		$sth->execute();
 		$experts = $sth->fetchAll();
