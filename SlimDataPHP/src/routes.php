@@ -47,9 +47,10 @@ $app->group('/accounts', function () use ($app) {
 		$sth->bindParam("email", $input['email']);
 		$sth->bindParam("pass", $input['pass']);
 		$sth->execute();
+		$log = $sth->fetchAll();
 		if($sth->rowCount() != 0)
 		{
-			return $this->response->withJson(array("Successful Login",1));
+			return $this->response->withJson(array($log,"Successful Login",1));
 		}
 		else
 		{
