@@ -139,7 +139,7 @@ $app->group('/accounts', function () use ($app) {
 		$input = $request->getParsedBody();
 		$sql = "UPDATE stories SET anchorID = NULL WHERE storyID=:storyID";
 		$sth = $this->db->prepare($sql);	
-		$sth->bindParam("storyID", $input['storyID']);
+		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
@@ -374,7 +374,7 @@ $app->group('/equipment', function () use ($app) {
 	
 	$app->delete('/deleteReservation[/{storyID}[/{equipID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
-		$sql = "DELETE FROM equipReservations WHERE storyID = :storyID AND equipID = :equipID";
+		$sql = "DELETE FROM equipReservations WHERE equipID = :equipID AND storyID = :storyID";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->bindParam("equipID", $args['equipID']);
