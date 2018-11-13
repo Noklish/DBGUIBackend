@@ -427,7 +427,7 @@ $app->group('/vehicles', function () use ($app) {
 	
 	$app->delete('/deleteReservation[/{storyID}[/{vehicleID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
-		$sql = "DELETE FROM vehicleReservations WHERE storyID = :storyID or vehicleID = :vehicleID";
+		$sql = "DELETE FROM vehicleReservations WHERE storyID = :storyID AND vehicleID = :vehicleID";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->bindParam("vehicleID", $args['vehicleID']);
@@ -476,7 +476,7 @@ $app->group('/experts', function () use ($app) {
 	});
 	$app->delete('/deleteReservation[/{storyID}[/{expertID}]]', function($request, $response, $args){
 		$input = $request->getParsedBody();
-		$sql = "DELETE FROM expertReservations WHERE storyID = :storyID or expertID = :expertID";
+		$sql = "DELETE FROM expertReservations WHERE storyID = :storyID AND expertID = :expertID";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->bindParam("expertID", $args['expertID']);
