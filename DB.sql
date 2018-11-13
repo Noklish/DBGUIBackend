@@ -9,11 +9,11 @@ insert into accounts (userName, email, pass, typeFlag) values("Ron Burgundy", "R
 insert into accounts (userName, email, pass, typeFlag) values("Alex Jones", "chemtrails@infowars.com", "frogs", 1);
 insert into accounts (userName, email, pass, typeFlag) values("Manager Man", "mgmt@anchormanagement.com", "manager", 0);
 
+
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
 insert into anchorDetails values (1, 0, 3);
 insert into anchorDetails values (2, 0, 3);
-
 
 drop table if exists stories;
 create table 
@@ -22,7 +22,6 @@ insert into stories (storyTopic, storyDate, startTime, endTime, anchorID, points
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "Christmas", '2018-12-25', '09:10:20','11:30:00', 5,"Presents!");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "Christmas Evening", '2018-12-25', '14:10:20','17:20:00',6,"Santa!");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ( "New Years Eve", '2018-12-31', '23:00:00','23:50:00',10,"nye");
-
 
 
 drop table if exists equipment;
