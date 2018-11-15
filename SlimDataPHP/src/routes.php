@@ -90,8 +90,8 @@ $app->group('/accounts', function () use ($app) {
 			$sth2->bindParam("points",$pts);
 			$sth2->execute();
 		}
-		$uID = $this->db->lastInsertID();
-		return $this->response->withJson(array($uID, $input));
+		//$uID = $this->db->lastInsertID();
+		return $this->response->withJson($this->db->lastInsertID());
 	});
 
 	$app->put('/updatePoints/[{userID}]', function($request, $response){
