@@ -50,11 +50,11 @@ $app->group('/accounts', function () use ($app) {
 		$log = $sth->fetchAll();
 		if($sth->rowCount() != 0)
 		{
-			return $this->response->withJson(array($log,"Successful Login",1));
+			return $this->response->withJson(array(1,$log));
 		}
 		else
 		{
-			return $this->response->withJson(array("Incorrect credentials; please try again",0));
+			return $this->response->withJson(0);
 		}
 	});
 
