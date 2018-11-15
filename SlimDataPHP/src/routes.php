@@ -78,7 +78,7 @@ $app->group('/accounts', function () use ($app) {
 		$sth->bindParam("pass", $input['pass']);
 		$sth->bindParam("typeFlag",$input['typeFlag']);
 		$sth->execute();
-		
+		$uID = $this->db->lastInsertID();
 		//If new account is an anchor
 		if($input['typeFlag'] != 0)
 		{
@@ -89,10 +89,8 @@ $app->group('/accounts', function () use ($app) {
 			$sth2->bindParam("userID",$uID);
 			$sth2->bindParam("points",$pts);
 			$sth2->execute();
-			return $this->response->withJson(array($uID, $input));
 		}
-		$uID = $this->db->lastInsertID();
-		return $this->response->withJson(array($uID, $input));
+		return $this->response->withJson($uID);
 	});
 
 	$app->put('/updatePoints/[{userID}]', function($request, $response){
