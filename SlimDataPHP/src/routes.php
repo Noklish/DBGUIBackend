@@ -18,7 +18,7 @@ $app->group('/accounts', function () use ($app) {
 	});
 
 	$app->get('/[{userID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT userId, userName, email FROM accounts WHERE userID=:userID");
+		$sth = $this->db->prepare("SELECT * FROM accounts WHERE userID=:userID");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$accounts = $sth->fetchAll();
@@ -155,7 +155,7 @@ $app->group('/accounts', function () use ($app) {
 
 $app->group('/stories', function () use ($app) {
 	$app->get('/story/[{storyID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT storyTopic, a.userName FROM stories s JOIN accounts a ON s.anchorID = a.userID WHERE storyID = :storyID");
+		$sth = $this->db->prepare("SELECT s.*, a.* FROM stories s JOIN accounts a ON s.anchorID = a.userID WHERE storyID = :storyID");
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$accounts = $sth->fetchAll();
