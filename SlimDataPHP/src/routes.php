@@ -134,7 +134,7 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($input);
 	});
 	
-	$app->put('/unassignFromStory/[{storyID}]', function($request, $response){
+	$app->put('/unassignFromStory/[{storyID}]', function($request, $response, $args){
 		$input = $request->getParsedBody();
 		$sql = "UPDATE stories SET anchorID = NULL WHERE storyID=:storyID";
 		$sth = $this->db->prepare($sql);	
