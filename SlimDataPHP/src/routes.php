@@ -350,6 +350,14 @@ $app->group('/equipment', function () use ($app) {
 		$equipment = $sth->fetchAll();
 		return $this->response->withJson($equipment);
 	});
+
+	$app->get('/reserved/[{anchorID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT e.* FROM equipment e JOIN equipReservations er ON e.equipID = er.equipID JOIN stories s ON s.storyID = vr.storyID WHERE s.anchorID = :anchorID");
+		$sth->bindParam("anchorID",$args['anchorID']);
+		$sth->execute();
+		$equipment = $sth->fetchAll();
+		return $this->response->withJson($equipment);
+	});
 	
 	$app->post('/reserve', function($request, $response){
 		$input = $request->getParsedBody();
@@ -381,7 +389,6 @@ $app->group('/equipment', function () use ($app) {
 		//$result = $sth->fetchAll();
 		return $this->response->withJson($input);
 	});
-	
 });
 	
 $app->group('/vehicles', function () use ($app) {
@@ -399,6 +406,14 @@ $app->group('/vehicles', function () use ($app) {
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
 		return $this->response->withJson($vehicles);	
+	});
+
+	$app->get('/reserved/[{anchorID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT v.* FROM vehicles v JOIN vehicleReservations vr ON v.vehicleID = vr.vehicleID JOIN stories s ON s.storyID = vr.storyID WHERE s.anchorID = :anchorID");
+		$sth->bindParam("anchorID",$args['anchorID']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
 	});
 	
 	$app->post('/reserve', function($request, $response){
