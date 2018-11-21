@@ -1,11 +1,31 @@
 <?php
 use Slim\Http\Request;
 use Slim\Http\Response;
+use \Firebase\JWT\JWT;
 header("Access-Control-Allow-Origin: *");
 // Routes
 
 $app->get('/',function ($request, $response, $args){
 	return "Welcome to Anchor Management! This is the homepage, and there's nothing here!";
+});
+
+$app->post('/login', function ($request, $response) {
+	$input = $request->getParsedBody();
+	$sth = $this->db->prepare("SELECT userID FROM accounts WHERE email = :email AND pass = :pass");
+	$sth->bindParam("email", $input['email']);
+	$sth->bindParam("pass", $input['pass']);
+	$sth->execute();
+	$log = $sth->fetchObject();
+	if($sth->rowCount() != 0)
+	{
+		$settings = $this->get('settings');
+		$token = JWT::encode(['userID' => $log->userID], $settings['jwt']['secret'], "HS256");
+		return $this->response->withJson(array(1,$log,$token));
+	}
+	else
+	{
+		return $this->response->withJson(0);
+	}
 });
 
 $app->group('/accounts', function () use ($app) {
@@ -39,23 +59,6 @@ $app->group('/accounts', function () use ($app) {
 		$sth->execute();
 		$mgr = $sth->fetchAll();
 		return $this->response->withJson($mgr);
-	});
-
-	$app->post('/login', function ($request, $response) {
-		$input = $request->getParsedBody();
-		$sth = $this->db->prepare("SELECT userID FROM accounts WHERE email = :email AND pass = :pass");
-		$sth->bindParam("email", $input['email']);
-		$sth->bindParam("pass", $input['pass']);
-		$sth->execute();
-		$log = $sth->fetchAll();
-		if($sth->rowCount() != 0)
-		{
-			return $this->response->withJson(array(1,$log));
-		}
-		else
-		{
-			return $this->response->withJson(0);
-		}
 	});
 
 	$app->post('/newAccount', function ($request, $response) {
