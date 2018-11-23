@@ -28,6 +28,41 @@ $app->post('/login', function ($request, $response) {
 	}
 });
 
+$app->post('/newAccount', function ($request, $response) {
+	$input = $request->getParsedBody();
+	$sql = "INSERT INTO accounts (userName, email, pass, typeFlag) VALUES (:userName, :email, :pass, :typeFlag)";
+	$sth = $this->db->prepare($sql);
+	
+	//ensure username and email are not already in use
+	$userNameSelected = $input['userName'];
+	$emailSelected = $input['email'];
+	$result = $this->db->prepare("SELECT email FROM accounts WHERE email = '$emailSelected'");
+	$result->execute();
+	if($result->rowCount() != 0)
+	{
+		echo "Email already in use, please select another or login to your existing account.";
+		return;
+	}
+	$sth->bindParam("userName", $userNameSelected);
+	$sth->bindParam("email", $emailSelected);
+	$sth->bindParam("pass", $input['pass']);
+	$sth->bindParam("typeFlag",$input['typeFlag']);
+	$sth->execute();
+	$uID = $this->db->lastInsertID();
+	//If new account is an anchor
+	if($input['typeFlag'] != 0)
+	{
+		$uID = $this->db->lastInsertID();
+		$anchorInsert = "INSERT INTO anchorDetails (userID, points) VALUES (:userID, :points)";
+		$sth2 = $this->db->prepare($anchorInsert);
+		$pts = 0;
+		$sth2->bindParam("userID",$uID);
+		$sth2->bindParam("points",$pts);
+		$sth2->execute();
+	}
+	return $this->response->withJson($uID);
+});
+
 $app->group('/accounts', function () use ($app) {
 
 	$app->get('/unmanagedAnchors', function(Request $request, Response $response, array $args) {
@@ -59,41 +94,6 @@ $app->group('/accounts', function () use ($app) {
 		$sth->execute();
 		$mgr = $sth->fetchAll();
 		return $this->response->withJson($mgr);
-	});
-
-	$app->post('/newAccount', function ($request, $response) {
-		$input = $request->getParsedBody();
-		$sql = "INSERT INTO accounts (userName, email, pass, typeFlag) VALUES (:userName, :email, :pass, :typeFlag)";
-		$sth = $this->db->prepare($sql);
-		
-		//ensure username and email are not already in use
-		$userNameSelected = $input['userName'];
-		$emailSelected = $input['email'];
-		$result = $this->db->prepare("SELECT email FROM accounts WHERE email = '$emailSelected'");
-		$result->execute();
-		if($result->rowCount() != 0)
-		{
-			echo "Email already in use, please select another or login to your existing account.";
-			return;
-		}
-		$sth->bindParam("userName", $userNameSelected);
-		$sth->bindParam("email", $emailSelected);
-		$sth->bindParam("pass", $input['pass']);
-		$sth->bindParam("typeFlag",$input['typeFlag']);
-		$sth->execute();
-		$uID = $this->db->lastInsertID();
-		//If new account is an anchor
-		if($input['typeFlag'] != 0)
-		{
-			$uID = $this->db->lastInsertID();
-			$anchorInsert = "INSERT INTO anchorDetails (userID, points) VALUES (:userID, :points)";
-			$sth2 = $this->db->prepare($anchorInsert);
-			$pts = 0;
-			$sth2->bindParam("userID",$uID);
-			$sth2->bindParam("points",$pts);
-			$sth2->execute();
-		}
-		return $this->response->withJson($uID);
 	});
 
 	$app->put('/updatePoints/[{userID}]', function($request, $response){
