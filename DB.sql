@@ -4,7 +4,7 @@ use AnchorManAgement;
 
 
 drop table if exists accounts;
-create table accounts (userID int not null auto_increment, userName varchar(50), email varchar(50), pass varchar(50), typeFlag bit, primary key(userID));
+create table accounts (userID int not null auto_increment, userName varchar(50), email varchar(50), pass varchar(50), typeFlag int, primary key(userID));
 #Dummy anchors
 insert into accounts (userName, email, pass, typeFlag) values("Ron Burgundy", "Ron@mail.com", "password", 1);
 insert into accounts (userName, email, pass, typeFlag) values("Alex Jones", "chemtrails@infowars.com", "frogs", 1);
