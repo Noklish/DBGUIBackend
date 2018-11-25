@@ -19,6 +19,9 @@ insert into accounts (userName, email, pass, typeFlag) values("Manager Man", "mg
 insert into accounts (userName, email, pass, typeFlag) values("Mark Fontenot", "mfonten@lyle.smu.edu", "winston", 0);
 insert into accounts (userName, email, pass, typeFlag) values("Richard Johnson", "dickJohnson@gmail.com", "default", 0);
 
+insert into accounts (userName, email, pass, typeFlag) values("Unassgined Anchor", "Not@Assigned.net", "nope", 1);
+insert into accounts (userName, email, pass, typeFlag) values("Newbie McJones", "newGuy@temp.org", "new", 1);
+
 drop table if exists anchorDetails;
 create table anchorDetails (userID int, points int, managerID int);
 insert into anchorDetails values (1, 104, 8);
@@ -28,6 +31,8 @@ insert into anchorDetails values (4, 42, 9);
 insert into anchorDetails values (5, 105, 9);
 insert into anchorDetails values (6, 2, 10);
 insert into anchorDetails values (7, 78, 10);
+insert into anchorDetails (userID, points) values (11, 0);
+insert into anchorDetails (userID, points) values (12, 0);
 
 drop table if exists stories;
 create table 
