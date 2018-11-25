@@ -146,7 +146,7 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($input);
 	});
 
-	$app->put('/unassignFromManager/{anchorID}', function($request, $response){
+	$app->put('/unassignFromManager/{userID}', function($request, $response){
 		$input = $request->getParsedBody();
 		$sql = "UPDATE anchorDetails SET managerID = NULL WHERE userID=:userID";
 		$sth = $this->db->prepare($sql);	
