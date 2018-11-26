@@ -416,7 +416,7 @@ $app->group('/vehicles', function () use ($app) {
 	});
 
 	$app->get('/reserved/[{anchorID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT v.* FROM vehicles v JOIN vehicleReservations vr ON v.vehicleID = vr.vehicleID JOIN stories s ON s.storyID = vr.storyID WHERE s.anchorID = :anchorID");
+		$sth = $this->db->prepare("SELECT v.*, s.* FROM vehicles v JOIN vehicleReservations vr ON v.vehicleID = vr.vehicleID JOIN stories s ON s.storyID = vr.storyID WHERE s.anchorID = :anchorID");
 		$sth->bindParam("anchorID",$args['anchorID']);
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
