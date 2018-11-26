@@ -11,7 +11,7 @@ $app->get('/',function ($request, $response, $args){
 
 $app->post('/login', function ($request, $response) {
 	$input = $request->getParsedBody();
-	$sth = $this->db->prepare("SELECT userID FROM accounts WHERE email = :email AND pass = :pass");
+	$sth = $this->db->prepare("SELECT * FROM accounts WHERE email = :email AND pass = :pass");
 	$sth->bindParam("email", $input['email']);
 	$sth->bindParam("pass", $input['pass']);
 	$sth->execute();
