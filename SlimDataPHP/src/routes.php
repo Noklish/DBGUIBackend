@@ -102,7 +102,7 @@ $app->group('/accounts', function () use ($app) {
 		$switch_on->execute();
 		$sql = "UPDATE anchorDetails ad INNER JOIN stories s ON s.storyID = :storyID AND ad.userID = s.anchorID SET ad.points= ad.points + :points";
 		$sth = $this->db->prepare($sql);	
-		$sth->bindParam("sotryID", $input['storyID']);
+		$sth->bindParam("storyID", $input['storyID']);
 		$sth->bindParam("points", $input['points']);
 		$sth->execute();
 		$switch_off = $this->db->prepare("SET SQL_SAFE_UPDATES=1");
