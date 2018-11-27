@@ -108,14 +108,14 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($mgr);
 	});
 
-	$app->put('/updatePoints/[{storyID}]', function($request, $response){
+	$app->put('/updatePoints/[{userID}]', function($request, $response){
 		$input = $request->getParsedBody();
 		$switch_on = $this->db->prepare("SET SQL_SAFE_UPDATES=0");
 		$switch_on->execute();
-		$sql = "UPDATE anchorDetails ad INNER JOIN stories s ON s.storyID = :storyID AND ad.userID = s.anchorID SET ad.points= ad.points + :points";
+		$sql = "UPDATE anchorDetails ad JOIN stories s ON s.storyID = :storyID AND ad.userID = s.anchorID SET ad.points = ad.points + s.points WHERE ad.userID = :userID";
 		$sth = $this->db->prepare($sql);	
 		$sth->bindParam("storyID", $input['storyID']);
-		$sth->bindParam("points", $input['points']);
+		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$switch_off = $this->db->prepare("SET SQL_SAFE_UPDATES=1");
 		$switch_off->execute();
