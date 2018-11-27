@@ -188,7 +188,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/myStories/[{userID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND (storyDate >= CURDATE() AND startTime >= time(now()))");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND (storyDate >= CURDATE() AND startTime >= time(now())) ORDER BY storyDate");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$stories = $sth->fetchAll();
@@ -204,7 +204,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/unclaimed', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND (storyDate >= CURDATE() AND startTime >= time(now()))");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND (storyDate >= CURDATE() AND startTime >= time(now())) ORDER BY storyDate");
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
