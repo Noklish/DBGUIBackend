@@ -152,7 +152,7 @@ $app->group('/accounts', function () use ($app) {
 
 	$app->put('/unassignFromManager/{userID}', function($request, $response){
 		$input = $request->getParsedBody();
-		$sql = "UPDATE anchorDetails SET managerID = NULL WHERE userID=:userID";
+		$sql = "UPDATE anchorDetails SET managerID = 0 WHERE userID=:userID";
 		$sth = $this->db->prepare($sql);	
 		$sth->bindParam("userID", $input['userID']);
 		$sth->execute();
