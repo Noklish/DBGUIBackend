@@ -348,7 +348,7 @@ $app->group('/stories', function () use ($app) {
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
-		return $this->response->withJson($input);
+		return $this->response->withJson($args);
 	});
 });
 
