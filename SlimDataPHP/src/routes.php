@@ -344,10 +344,14 @@ $app->group('/stories', function () use ($app) {
 
 	$app->delete('/deleteEvent/[{storyID}]', function($request, $response, $args){
 		$input = $request->getParsedBody();
+		$safeOff = $this->db->prepare("SET SQL_SAFE_UPDATES=0");
+		$safeOff->execute();
 		$sql = "DELETE FROM stories WHERE storyID = :storyID";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
+		$safeOn = $this->db->prepare("SET SQL_SAFE_UPDATES=1");
+		$safeOn->execute();
 		return $this->response->withJson($args);
 	});
 });
