@@ -46,7 +46,6 @@ insert into stories (storyTopic, storyDate, startTime, endTime, points, descript
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ("Winter Games", '2018-12-10', '3:00:00','6:30:00',5,"Fun at the park");
 insert into stories (storyTopic, storyDate, startTime, endTime, points, description) values ("State of the Union", '2019-01-16', '12:00:00','4:00:00',20,"Good luck");
 
-
 drop table if exists equipment;
 create table equipment (equipID int not null auto_increment, equipName varchar(50), equipType varchar(50),  primary key (equipID));
 insert into equipment (equipName, equipType) values ("Boom Mic 1", "Boom Mic");
@@ -72,10 +71,10 @@ insert into vehicles (vehicleName, vehicleType, color, model, capacity) values (
 
 
 drop table if exists vehicleReservations;
-create table vehicleReservations (vehicleID int, storyID int);
+create table vehicleReservations (vehicleID int, storyID int, foreign key(storyID) references stories(storyID) ON DELETE CASCADE);
 
 drop table if exists equipReservations;
-create table equipReservations (equipID int, storyID int);
+create table equipReservations (equipID int, storyID int, foreign key(storyID) references stories(storyID) ON DELETE CASCADE);
 
 drop table if exists experts;
 create table experts (expertID int not null auto_increment, expertName varchar(50), expertTopic varchar(50), primary key(expertID));
@@ -88,4 +87,4 @@ insert into experts (expertName, expertTopic) values ("Derrick", "Databases");
 insert into experts (expertName, expertTopic) values ("John Smith", "Financial");
 
 drop table if exists expertReservations;
-create table expertReservations (expertID int, storyID int);
+create table expertReservations (expertID int, storyID int, foreign key(storyID) references stories(storyID) ON DELETE CASCADE);
