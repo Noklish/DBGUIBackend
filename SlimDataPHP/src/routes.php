@@ -188,7 +188,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/myStories/[{userID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND storyDate >= CURDATE()");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND (storyDate >= CURDATE() AND storyTime >= time(now()))");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$stories = $sth->fetchAll();
@@ -204,7 +204,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/unclaimed', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND storyDate >= CURDATE()");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND (storyDate >= CURDATE() AND storyTime >= time(now()))");
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
@@ -415,7 +415,7 @@ $app->group('/equipment', function () use ($app) {
 	
 $app->group('/vehicles', function () use ($app) {
 	$app->get('/filter/[{conditions}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE vehicleType = :conditions OR color = :conditions OR capacity = :conditions ORDER BY vehicleName");
+		$sth = $this->db->prepare("SELECT * FROM vehicles WHERE vehicleType = :conditions OR color = :conditions ORDER BY vehicleName");
 		$sth->bindParam("conditions", $args['conditions']);
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
@@ -450,13 +450,12 @@ $app->group('/vehicles', function () use ($app) {
 	
 	$app->post('/add', function ($request, $response) {
 		$input = $request->getParsedBody();
-		$sql = "INSERT INTO vehicles (vehicleName, vehicleType, color, model, capacity, storyID) VALUES (:vehicleName, :vehicleType, :color, :model, :capacity)";
+		$sql = "INSERT INTO vehicles (vehicleName, vehicleType, color, model) VALUES (:vehicleName, :vehicleType, :color, :model)";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("vehicleName", $input['vehicleName']);
 		$sth->bindParam("vehicleType", $input['vehicleType']);
 		$sth->bindParam("color", $input['color']);
 		$sth->bindParam("model", $input['model']);
-		$sth->bindParam("capacity", $input['capacity']);
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
