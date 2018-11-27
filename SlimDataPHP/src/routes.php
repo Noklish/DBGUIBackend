@@ -110,7 +110,7 @@ $app->group('/accounts', function () use ($app) {
 
 	$app->put('/updatePoints/[{userID}]', function($request, $response){
 		$input = $request->getParsedBody();
-		$sql = "UPDATE anchorDetails ad JOIN stories s ON s.anchorID = ad.userID SET ad.points = ad.points + s.points WHERE ad.userID = :userID";
+		$sql = "UPDATE anchorDetails ad JOIN stories s ON s.anchorID = ad.userID SET ad.points = ad.points + s.points WHERE ad.userID = :userID AND s.storyID = :storyID";
 		$sth = $this->db->prepare($sql);	
 		$sth->bindParam("storyID", $input['storyID']);
 		$sth->bindParam("userID", $args['userID']);
