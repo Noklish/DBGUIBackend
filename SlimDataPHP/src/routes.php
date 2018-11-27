@@ -306,13 +306,13 @@ $app->group('/stories', function () use ($app) {
 
 	$app->post('/createNew', function ($request, $response) {
 		$input = $request->getParsedBody();
-		$sql = "INSERT INTO stories (storyTopic, storyDate, startTime, endTime, anchorID, description) VALUES (:storyTopic, :storyDate, :startTime, :endTime, :anchorID, :description)";
+		$sql = "INSERT INTO stories (storyTopic, storyDate, startTime, endTime, description, points) VALUES (:storyTopic, :storyDate, :startTime, :endTime, :description, :points)";
 		$sth = $this->db->prepare($sql);
 		$sth->bindParam("storyTopic", $input['storyTopic']);
 		$sth->bindParam("storyDate", $input['storyDate']);
 		$sth->bindParam("startTime", $input['startTime']);
 		$sth->bindParam("endTime", $input['endTime']);
-		$sth->bindParam("anchorID", $input['anchorID']);
+		$sth->bindParam("points", $input['points']);
 		$sth->bindParam("description", $input['description']);
 		$sth->execute();
 		return $this->response->withJson($input);
