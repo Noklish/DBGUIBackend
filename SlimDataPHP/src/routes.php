@@ -154,7 +154,7 @@ $app->group('/accounts', function () use ($app) {
 		$input = $request->getParsedBody();
 		$sql = "UPDATE anchorDetails SET managerID = 0 WHERE userID=:userID";
 		$sth = $this->db->prepare($sql);	
-		$sth->bindParam("userID", $input['userID']);
+		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		return $this->response->withJson($input);
 	});
