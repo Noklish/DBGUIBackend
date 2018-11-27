@@ -108,7 +108,7 @@ $app->group('/accounts', function () use ($app) {
 		return $this->response->withJson($mgr);
 	});
 
-	$app->put('/updatePoints/[{userID}]', function($request, $response){
+	$app->put('/updatePoints/[{userID}]', function($request, $response, $args){
 		$input = $request->getParsedBody();
 		$safeOff = $this->db->prepare("SET SQL_SAFE_UPDATES=0");
 		$safeOff->execute();
