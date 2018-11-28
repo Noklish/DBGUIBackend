@@ -7,15 +7,15 @@ header("Access-Control-Allow-Origin: *");
 
 $app->options('/{routes:.+}', function($request, $response, $args){
 	return $response;
-	});
+});
 	
-	$app->add(function ($req, $res, $next) {
+$app->add(function ($req, $res, $next) {
 	$response = $next($req, $res);
 	return $response
 	->withHeader('Access-Control-Allow-Origin', '*')
 	->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
 	->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-	});
+});
 
 $app->get('/',function ($request, $response, $args){
 	return "Welcome to Anchor Management! This is the homepage, and there's nothing here!";
@@ -195,16 +195,16 @@ $app->group('/stories', function () use ($app) {
 		return $this->response->withJson($stories);
 	});
 
-	$app->get('/specificStory/[{storyDate}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE storyDate = :storyDate ORDER BY startTime");
-		$sth->bindParam("storyDate", $args['storyDate']);
+	$app->get('/specificStory/[{storyID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE storyID = :storyID ORDER BY startTime");
+		$sth->bindParam("storyID", $args['storyID']);
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
 	});
 
 	$app->get('/unclaimed', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND (storyDate >= CURDATE() AND startTime >= time(now())) ORDER BY storyDate");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID IS NULL AND storyDate >= CURDATE() ORDER BY storyDate, startTime");
 		$sth->execute();
 		$stories = $sth->fetchAll();
 		return $this->response->withJson($stories);
