@@ -85,7 +85,7 @@ $app->group('/accounts', function () use ($app) {
 	});
 
 	$app->get('/[{userID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT a.*, ad.points FROM accounts a JOIN anchorDetails ad ON a.userID = ad.userID WHERE userID=:userID");
+		$sth = $this->db->prepare("SELECT a.*, ad.points FROM accounts a JOIN anchorDetails ad ON a.userID = ad.userID WHERE a.userID=:userID");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$accounts = $sth->fetchAll();
