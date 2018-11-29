@@ -490,6 +490,13 @@ $app->group('/experts', function () use ($app) {
 		return $this->response->withJson($vehicles);	
 	});
 	
+	$app->get('/reserved/[{anchorID}]', function (Request $request, Response $response, array $args) {
+		$sth = $this->db->prepare("SELECT e.*, s.* FROM experts e JOIN expertReservations er ON e.expertID = er.expertID JOIN stories s ON s.storyID = er.storyID WHERE s.anchorID = :anchorID");
+		$sth->bindParam("anchorID",$args['anchorID']);
+		$sth->execute();
+		$vehicles = $sth->fetchAll();
+		return $this->response->withJson($vehicles);
+	
 	$app->post('/reserve', function($request, $response){
 		$input = $request->getParsedBody();
 		$sql = "INSERT INTO expertReservations(expertID, storyID) values (:expertID, :storyID)";
