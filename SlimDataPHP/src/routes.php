@@ -496,6 +496,7 @@ $app->group('/experts', function () use ($app) {
 		$sth->execute();
 		$vehicles = $sth->fetchAll();
 		return $this->response->withJson($vehicles);
+	});
 	
 	$app->post('/reserve', function($request, $response){
 		$input = $request->getParsedBody();
