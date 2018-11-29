@@ -188,7 +188,7 @@ $app->group('/stories', function () use ($app) {
 	});
 
 	$app->get('/myStories/[{userID}]', function (Request $request, Response $response, array $args) {
-		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID AND storyDate >= CURDATE() ORDER BY storyDate, startTime");
+		$sth = $this->db->prepare("SELECT * FROM stories WHERE anchorID = :userID ORDER BY storyDate, startTime");
 		$sth->bindParam("userID", $args['userID']);
 		$sth->execute();
 		$stories = $sth->fetchAll();
